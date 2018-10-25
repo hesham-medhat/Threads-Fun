@@ -25,6 +25,12 @@ void openFileStreams() {
     lfs.open(logFileName);
 }
 
+void closeFileStreams() {
+    ifs.close();
+    ofs.close();
+    lfs.close();
+}
+
 // Logs intended logMessage to log file <logFileName> or to stdout on failure.
 void log(std::string const &logMessage) {
     if (lfs.is_open()) {
@@ -73,6 +79,7 @@ void* mergeSort(void * runnerParams) {
         start = ((mergeRunnerParams*) runnerParams)->start;
         end = ((mergeRunnerParams*) runnerParams)->end;
     }
+    if (start >= end) return nullptr;
     int mid = (start + end) / 2;
     mergeRunnerParams leftSortParams = {start, mid};
     mergeRunnerParams rightSortParams = {mid + 1, end};
@@ -95,10 +102,11 @@ void readArray() {
     log("Input read successfully.");
 }
 
-void printArray() {
+void outputArray() {
     log("Printing array to stdout.");
     for (int i = 0; i < n; i++) {
-        std::cout << arr[i] << std::endl;
+        std::cout << arr[i] << " ";
+        ofs << arr[i] << " ";
     }
 }
 
@@ -116,9 +124,12 @@ int main() {
 
         mergeSort(nullptr);
 
-        printArray();
+        outputArray();
+
+        closeFileStreams();
     } else {
         log("Input file read failed.");
+        closeFileStreams();
         return 1;
     }
 
