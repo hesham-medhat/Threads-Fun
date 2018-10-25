@@ -14,6 +14,11 @@ int n;// Size of the array
 int* arr;
 int* aux;
 
+struct mergeRunnerParams {
+    int start;
+    int end;
+};
+
 void openFileStreams() {
     ifs.open(inputFileName);
     ofs.open(outputFileName);
@@ -27,19 +32,6 @@ void log(std::string const &logMessage) {
     } else {
         std::cout << "Can't access log file.\nIntended log message:\n" << logMessage << std::endl;
     }
-}
-
-void readInput() {
-    log("Reading input.");
-    ifs >> n;
-    int arrReserve[n];
-    int auxReserve[n];
-    arr = arrReserve;
-    aux = auxReserve;
-    for(int i = 0; i < n; i++) {
-        ifs >> arr[i];
-    }
-    log("Input read successfully.");
 }
 
 void merge(int start, int mid, int end) {
@@ -72,14 +64,39 @@ void merge(int start, int mid, int end) {
 }
 
 // Merge sorts arr
-void mergeSort(int start, int end) {
+void* mergeSort(void * runnerParams) {
+    int start, end;
+    if (runnerParams == nullptr) {// Initial sort call. Not a runner.
+        start = 0;
+        end = n - 1;
+    } else {
+        start = ((mergeRunnerParams*) runnerParams)->start;
+        end = ((mergeRunnerParams*) runnerParams)->end;
+    }
     int mid = (start + end) / 2;
-    mergeSort(start, mid);
-    mergeSort(mid + 1, end);
+    mergeRunnerParams leftSortParams = {start, mid};
+    mergeRunnerParams rightSortParams = {mid + 1, end};
+
+    pthread_t thread;
+    pthread_create(&thread, nullptr, mergeSort, &leftSortParams);
+
+    mergeSort(&rightSortParams);
+    pthread_join(thread, nullptr);
+
     merge(start, mid, end);
+
+    return nullptr;
+}
+
+void readArray() {
+    for(int i = 0; i < n; i++) {
+        ifs >> arr[i];
+    }
+    log("Input read successfully.");
 }
 
 void printArray() {
+    log("Printing array to stdout.");
     for (int i = 0; i < n; i++) {
         std::cout << arr[i] << std::endl;
     }
@@ -88,8 +105,17 @@ void printArray() {
 int main() {
     openFileStreams();
     if (ifs.is_open()) {
-        readInput();
-        mergeSort(0, n - 1);
+        // Read input
+        log("Reading input.");
+        ifs >> n;
+        int arrReserve[n];
+        int auxReserve[n];
+        arr = arrReserve;
+        aux = auxReserve;
+        readArray();
+
+        mergeSort(nullptr);
+
         printArray();
     } else {
         log("Input file read failed.");
