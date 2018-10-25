@@ -21,7 +21,7 @@ void openFileStreams() {
 }
 
 // Logs intended logMessage to log file <logFileName> or to stdout on failure.
-void log(std::string logMessage) {
+void log(std::string const &logMessage) {
     if (lfs.is_open()) {
         lfs << logMessage << std::endl;
     } else {
@@ -30,9 +30,9 @@ void log(std::string logMessage) {
 }
 
 void readMatrix(int rows, int columns, std::vector<std::vector<int>> &matrix) {
-    matrix.reserve(rows);
+    matrix.reserve((unsigned long) rows);
     for (int r = 0; r < rows; r++) {
-        matrix[r].reserve(columns);
+        matrix[r].reserve((unsigned long) columns);
         for (int c = 0; c < columns; c++) {
             ifs >> matrix[r][c];
         }

@@ -19,7 +19,7 @@ void openFileStreams() {
 }
 
 // Logs intended logMessage to log file <logFileName> or to stdout on failure.
-void log(std::string logMessage) {
+void log(std::string const &logMessage) {
     if (lfs.is_open()) {
         lfs << logMessage << std::endl;
     } else {
@@ -30,6 +30,8 @@ void log(std::string logMessage) {
 void readInput() {
     log("Reading input.");
     ifs >> n;
+    int reserve[n];
+    arr = reserve;
     for(int i = 0; i < n; i++) {
         ifs >> arr[i];
     }
