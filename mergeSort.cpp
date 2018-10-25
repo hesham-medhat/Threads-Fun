@@ -42,8 +42,10 @@ int main() {
         readInput();
 
         // TODO: Merge sort the array.
+
     } else {
         log("Input file read failed.");
+        return 1;
     }
 
     return 0;
